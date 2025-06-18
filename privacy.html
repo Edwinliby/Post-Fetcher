@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .privacy-page {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #34495e;
+            margin: 30px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e74c3c;
+            position: relative;
+        }
+
+        h2::before {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        p {
+            margin-bottom: 15px;
+            font-size: 1rem;
+            color: #555;
+            text-align: justify;
+        }
+
+        p:first-of-type {
+            text-align: center;
+            font-style: italic;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+
+        ul {
+            margin: 15px 0 20px 0;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        li {
+            margin-bottom: 12px;
+            padding: 12px 20px;
+            background: rgba(103, 126, 234, 0.05);
+            border-left: 4px solid #667eea;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: #555;
+            transition: all 0.3s ease;
+        }
+
+        li:hover {
+            background: rgba(103, 126, 234, 0.1);
+            transform: translateX(5px);
+        }
+
+        strong {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white !important;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(103, 126, 234, 0.3);
+        }
+
+        .nav-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(103, 126, 234, 0.4);
+            background: linear-gradient(135deg, #5a67d8, #6b46c1);
+        }
+
+        .nav-link:active {
+            transform: translateY(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .privacy-page {
+                padding: 25px;
+                border-radius: 15px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.2rem;
+            }
+
+            li {
+                padding: 10px 15px;
+            }
+
+            .nav-link {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .privacy-page {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            h2 {
+                font-size: 1.1rem;
+            }
+
+            p,
+            li {
+                font-size: 0.9rem;
+                text-align: left;
+            }
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Focus states for accessibility */
+        .nav-link:focus {
+            outline: 2px solid #667eea;
+            outline-offset: 2px;
+        }
+
+        /* Animation for page load */
+        .privacy-page {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="privacyPage" class="privacy-page">
+        <h1>Privacy Policy</h1>
+
+        <p><strong>Last updated:</strong> January 2025</p>
+
+        <h2>1. Information We Collect</h2>
+        <p>Our Instagram Hashtag Tracker collects and processes the following types of information:</p>
+        <ul>
+            <li><strong>API Configuration Data:</strong> Instagram API credentials (Client ID, Client Secret, Access
+                Tokens)</li>
+            <li><strong>Search Data:</strong> Hashtags and search queries you enter</li>
+            <li><strong>Instagram Content Data:</strong> Public Instagram posts, including captions, media URLs,
+                engagement metrics</li>
+            <li><strong>Usage Analytics:</strong> How you interact with our application (anonymized)</li>
+        </ul>
+
+        <h2>2. How We Use Your Information</h2>
+        <p>We use the collected information for the following purposes:</p>
+        <ul>
+            <li>To retrieve and display Instagram content based on your hashtag searches</li>
+            <li>To provide analytics and insights on Instagram engagement</li>
+            <li>To improve our service functionality and user experience</li>
+            <li>To ensure compliance with Instagram's API terms of service</li>
+        </ul>
+
+        <h2>3. Data Storage and Security</h2>
+        <p>We implement appropriate security measures to protect your information:</p>
+        <ul>
+            <li><strong>Local Storage:</strong> API credentials are stored locally in your browser only</li>
+            <li><strong>No Server Storage:</strong> We do not store your API credentials on our servers</li>
+            <li><strong>Encryption:</strong> All data transmission uses HTTPS encryption</li>
+            <li><strong>Data Retention:</strong> Search results are cached temporarily for performance</li>
+        </ul>
+
+        <h2>4. Third-Party Services</h2>
+        <p>Our application integrates with the following third-party services:</p>
+        <ul>
+            <li><strong>Instagram API:</strong> To fetch public content and user data</li>
+            <li><strong>Facebook Graph API:</strong> For authentication and data access</li>
+        </ul>
+        <p>These services have their own privacy policies that govern the use of your data.</p>
+
+        <h2>5. Data Sharing</h2>
+        <p>We do not sell, trade, or otherwise transfer your personal information to third parties, except:</p>
+        <ul>
+            <li>When required by law or legal process</li>
+            <li>To protect our rights, property, or safety</li>
+            <li>With your explicit consent</li>
+        </ul>
+
+        <h2>6. Your Rights</h2>
+        <p>You have the following rights regarding your data:</p>
+        <ul>
+            <li><strong>Access:</strong> Request access to your personal data</li>
+            <li><strong>Correction:</strong> Request correction of inaccurate data</li>
+            <li><strong>Deletion:</strong> Request deletion of your data</li>
+            <li><strong>Portability:</strong> Request export of your data</li>
+            <li><strong>Withdrawal:</strong> Withdraw consent for data processing</li>
+        </ul>
+
+        <h2>7. Contact Information</h2>
+        <p>If you have any questions about this privacy policy or our data practices, please contact us at:</p>
+        <ul>
+            <li><strong>Email:</strong> privacy@instagramtracker.com</li>
+            <li><strong>Address:</strong> [Your Company Address]</li>
+            <li><strong>Phone:</strong> [Your Contact Number]</li>
+        </ul>
+
+        <a href="/index.html" class="nav-link" style="margin-top: 30px;">← Back to
+            Dashboard
+        </a>
+    </div>
+</body>
+
+</html>

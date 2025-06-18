@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Hashtag Tracker</title>
+    <link rel="stylesheet" href="/index.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="instagram-logo">📸</div>
+            <h1>Instagram Hashtag Tracker</h1>
+            <p>Professional Instagram content analysis tool</p>
+            <div class="nav-links">
+                <a href="#" class="nav-link" onclick="showMainApp()">🏠 Dashboard</a>
+                <a href="/privacy.html" class="nav-link">🔒 Privacy Policy</a>
+                <a href="#" class="nav-link" onclick="exportData()">📊 Export Data</a>
+            </div>
+        </div>
+
+        <!-- Main Application -->
+        <div id="mainApp">
+            <div class="search-section">
+                <!-- API Configuration -->
+                <div class="api-config">
+                    <h3>🔧 API Configuration</h3>
+                    <div class="config-row">
+                        <input type="text" class="config-input" id="clientId" placeholder="Instagram Client ID">
+                        <input type="text" class="config-input" id="clientSecret" placeholder="Client Secret">
+                        <input type="text" class="config-input" id="accessToken" placeholder="Access Token">
+                        <button class="save-config-btn" onclick="saveAPIConfig()">Save Config</button>
+                    </div>
+                    <p style="font-size: 12px; color: #666; margin-top: 10px;">
+                        Get your credentials from <a href="https://developers.facebook.com/apps/"
+                            target="_blank">Facebook Developers</a>
+                    </p>
+                </div>
+
+                <!-- Search Form -->
+                <div class="search-form">
+                    <input type="text" class="hashtag-input" id="hashtagInput"
+                        placeholder="Enter hashtags (e.g., #travel, #photography, #food)">
+                    <button class="search-btn" id="searchBtn" onclick="searchInstagramContent()">
+                        🔍 Search Posts
+                    </button>
+                </div>
+
+                <!-- Sort Options -->
+                <div class="sort-options">
+                    <span class="sort-label">Sort by:</span>
+                    <button class="sort-btn active" data-sort="likes">❤️ Most Liked</button>
+                    <button class="sort-btn" data-sort="comments">💬 Most Comments</button>
+                    <button class="sort-btn" data-sort="recent">⏰ Most Recent</button>
+                    <button class="sort-btn" data-sort="engagement">🔥 Engagement</button>
+                </div>
+
+                <!-- Data Import Section -->
+                <div class="data-import">
+                    <h3>📋 Import Your Data</h3>
+                    <p>Paste your Instagram API response data here (JSON format):</p>
+                    <textarea class="data-textarea" id="dataImport" placeholder='Paste your JSON data here, example:
+[
+  {
+    "id": "post_1",
+    "username": "example_user",
+    "caption": "Your post caption here",
+    "media_url": "https://example.com/image.jpg",
+    "like_count": 1500,
+    "comments_count": 45,
+    "timestamp": "2024-01-15T10:30:00Z",
+    "media_type": "IMAGE",
+    "hashtags": ["#example", "#hashtag"]
+  }
+]'></textarea>
+                    <button class="import-btn" onclick="importData()">Import Data</button>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section">
+                <div class="results-header">
+                    <h2 id="resultsTitle">Configure API or import data to get started</h2>
+                    <div class="results-stats" id="resultsStats"></div>
+                </div>
+                <div id="resultsContainer">
+                    <div class="no-results">
+                        <div class="no-results-icon">🚀</div>
+                        <p>Ready to analyze Instagram content!</p>
+                        <p>Configure your API credentials or import data to begin</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Section -->
+            <div class="export-section" style="display: none;" id="exportSection">
+                <h3>📊 Export Results</h3>
+                <button class="export-btn" onclick="exportToJSON()">Export as JSON</button>
+                <button class="export-btn" onclick="exportToCSV()">Export as CSV</button>
+                <button class="export-btn" onclick="generateReport()">Generate Report</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let instagramData = [];
+        let currentSort = 'likes';
+        let apiConfig = {
+            clientId: '',
+            clientSecret: '',
+            accessToken: ''
+        };
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function () {
+            loadAPIConfig();
+            initializeSortButtons();
+            setupEventListeners();
+        });
+
+        // API Configuration functions
+        function saveAPIConfig() {
+            apiConfig.clientId = document.getElementById('clientId').value;
+            apiConfig.clientSecret = document.getElementById('clientSecret').value;
+            apiConfig.accessToken = document.getElementById('accessToken').value;
+
+            // Save to local storage
+            const configData = {
+                clientId: apiConfig.clientId,
+                clientSecret: apiConfig.clientSecret,
+                accessToken: apiConfig.accessToken
+            };
+
+            // Store in a variable instead of localStorage
+            window.savedConfig = configData;
+
+            showMessage('API configuration saved successfully!', 'success');
+        }
+
+        function loadAPIConfig() {
+            if (window.savedConfig) {
+                apiConfig = window.savedConfig;
+                document.getElementById('clientId').value = apiConfig.clientId || '';
+                document.getElementById('clientSecret').value = apiConfig.clientSecret || '';
+                document.getElementById('accessToken').value = apiConfig.accessToken || '';
+            }
+        }
+
+        // Search and data functions
+        async function searchInstagramContent() {
+            const hashtag = document.getElementById('hashtagInput').value.trim();
+            if (!hashtag) {
+                showMessage('Please enter at least one hashtag', 'error');
+                return;
+            }
+
+            const searchBtn = document.getElementById('searchBtn');
+            searchBtn.disabled = true;
+            searchBtn.textContent = '🔄 Searching...';
+
+            showLoading();
+
+            try {
+                // Check if API is configured
+                if (!apiConfig.accessToken) {
+                    throw new Error('Please configure your Instagram API credentials first');
+                }
+
+                // Simulate API call (replace with actual Instagram API endpoint)
+                const data = await fetchInstagramData(hashtag);
+                instagramData = data;
+                displayResults(hashtag);
+
+                // Show export section
+                document.getElementById('exportSection').style.display = 'block';
+
+            } catch (error) {
+                showMessage(`Search failed: ${error.message}`, 'error');
+                showNoResults('Search failed. Please check your API configuration or import data manually.');
+            } finally {
+                searchBtn.disabled = false;
+                searchBtn.textContent = '🔍 Search Posts';
+            }
+        }
+
+        async function fetchInstagramData(hashtag) {
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            // This is where you would make the actual Instagram API call
+            // For now, we'll simulate an API call failure to encourage data import
+            throw new Error('No API integration yet. Please import your data manually.');
+        }
+
+        function importData() {
+            const dataText = document.getElementById('dataImport').value.trim();
+            if (!dataText) {
+                showMessage('Please paste your JSON data', 'error');
+                return;
+            }
+
+            try {
+                const data = JSON.parse(dataText);
+                if (!Array.isArray(data)) {
+                    throw new Error('Data must be an array of posts');
+                }
+
+                // Validate data structure
+                for (let post of data) {
+                    if (!post.id || !post.username) {
+                        throw new Error('Invalid data structure. Each post must have id and username');
+                    }
+                }
+
+                instagramData = data;
+                showMessage(`Successfully imported ${data.length} posts!`, 'success');
+
+                // Display results
+                const hashtag = document.getElementById('hashtagInput').value || 'Imported Data';
+                displayResults(hashtag);
+
+                // Show export section
+                document.getElementById('exportSection').style.display = 'block';
+
+            } catch (error) {
+                showMessage(`Import failed: ${error.message}`, 'error');
+            }
+        }
+
+        function displayResults(searchTerm) {
+            if (!instagramData || instagramData.length === 0) {
+                showNoResults('No data available');
+                return;
+            }
+
+            // Sort data
+            const sortedData = sortInstagramPosts([...instagramData], currentSort);
+
+            // Update results header
+            const totalLikes = sortedData.reduce((sum, post) => sum + (post.like_count || post.likes || 0), 0);
+            const totalComments = sortedData.reduce((sum, post) => sum + (post.comments_count || post.comments || 0), 0);
+
+            document.getElementById('resultsTitle').textContent = `Results for "${searchTerm}"`;
+            document.getElementById('resultsStats').textContent =
+                `${sortedData.length} posts • ${formatNumber(totalLikes)} total likes • ${formatNumber(totalComments)} total comments`;
+
+            // Generate HTML
+            const postsHTML = sortedData.map(post => createPostHTML(post)).join('');
+            document.getElementById('resultsContainer').innerHTML =
+                `<div class="instagram-grid">${postsHTML}</div>`;
+        }
+
+        function createPostHTML(post) {
+            const username = post.username || 'unknown_user';
+            const caption = post.caption || post.text || 'No caption';
+            const likes = post.like_count || post.likes || 0;
+            const comments = post.comments_count || post.comments || 0;
+            const mediaUrl = post.media_url || post.image_url || '';
+            const mediaType = post.media_type || post.type || 'IMAGE';
+            const hashtags = post.hashtags || [];
+            const timestamp = post.timestamp || post.created_time || 'Unknown time';
+
+            // Create hashtags HTML
+            const hashtagsHTML = hashtags.map(tag => `<span class="hashtag">${tag}</span>`).join('');
+
+            return `
+                <div class="instagram-post">
+                    <div class="post-header">
+                        <div class="profile-pic">${username.charAt(0).toUpperCase()}</div>
+                        <div class="post-user">
+                            <div class="username">@${username}</div>
+                            <div class="post-time">${formatTimestamp(timestamp)}</div>
+                        </div>
+                    </div>
+                    <div class="post-image">
+                        ${mediaUrl ? `<img src="${mediaUrl}" alt="Instagram post" onerror="this.style.display='none'">` : '📸'}
+                        <div class="post-type-badge">${mediaType.toLowerCase()}</div>
+                    </div>
+                    <div class="post-content">
+                        <div class="post-caption">${truncateText(caption, 100)}</div>
+                        <div class="post-hashtags">${hashtagsHTML}</div>
+                        <div class="post-stats">
+                            <div class="stat-item">
+                                <span>❤️</span>
+                                <span>${formatNumber(likes)}</span>
+                            </div>
+                            <div class="stat-item">
+                                <span>💬</span>
+                                <span>${formatNumber(comments)}</span>
+                            </div>
+                            <div class="stat-item">
+                                <span>📊</span>
+                                <span>${calculateEngagementRate(likes, comments)}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function sortInstagramPosts(posts, sortBy) {
+            switch (sortBy) {
+                case 'likes':
+                    return posts.sort((a, b) => (b.like_count || b.likes || 0) - (a.like_count || a.likes || 0));
+                case 'comments':
+                    return posts.sort((a, b) => (b.comments_count || b.comments || 0) - (a.comments_count || a.comments || 0));
+                case 'recent':
+                    return posts.sort((a, b) => new Date(b.timestamp || b.created_time || 0) - new Date(a.timestamp || a.created_time || 0));
+                case 'engagement':
+                    return posts.sort((a, b) => {
+                        const aEngagement = (a.like_count || a.likes || 0) + (a.comments_count || a.comments || 0);
+                        const bEngagement = (b.like_count || b.likes || 0) + (b.comments_count || b.comments || 0);
+                        return bEngagement - aEngagement;
+                    });
+                default:
+                    return posts;
+            }
+        }
+
+        // Utility functions
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+
+        function formatTimestamp(timestamp) {
+            try {
+                const date = new Date(timestamp);
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            } catch (error) {
+                return 'Unknown date';
+            }
+        }
+
+        function truncateText(text, maxLength) {
+            if (text.length <= maxLength) return text;
+            return text.substring(0, maxLength) + '...';
+        }
+
+        function calculateEngagementRate(likes, comments) {
+            const total = likes + comments;
+            if (total === 0) return 0;
+            // Simplified engagement rate calculation
+            return ((total / 1000) * 100).toFixed(1);
+        }
+
+        // UI functions
+        function showMessage(message, type) {
+            // Create message element
+            const messageEl = document.createElement('div');
+            messageEl.className = `message ${type}`;
+            messageEl.textContent = message;
+            messageEl.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 10px;
+                color: white;
+                z-index: 1000;
+                background: ${type === 'success' ? '#28a745' : '#dc3545'};
+            `;
+
+            document.body.appendChild(messageEl);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                messageEl.remove();
+            }, 3000);
+        }
+
+        function showLoading() {
+            document.getElementById('resultsContainer').innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner">🔄</div>
+                    <p>Searching Instagram content...</p>
+                </div>
+            `;
+        }
+
+        function showNoResults(message) {
+            document.getElementById('resultsContainer').innerHTML = `
+                <div class="no-results">
+                    <div class="no-results-icon">😔</div>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        // Navigation functions
+        function showMainApp() {
+            document.getElementById('mainApp').style.display = 'block';
+            document.getElementById('privacyPage').style.display = 'none';
+        }
+
+        // Export functions
+        function exportData() {
+            if (!instagramData || instagramData.length === 0) {
+                showMessage('No data to export', 'error');
+                return;
+            }
+            exportToJSON();
+        }
+
+        function exportToJSON() {
+            if (!instagramData || instagramData.length === 0) {
+                showMessage('No data to export', 'error');
+                return;
+            }
+
+            const dataStr = JSON.stringify(instagramData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `instagram_data_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showMessage('Data exported as JSON successfully!', 'success');
+        }
+
+        function exportToCSV() {
+            if (!instagramData || instagramData.length === 0) {
+                showMessage('No data to export', 'error');
+                return;
+            }
+
+            const headers = ['Username', 'Caption', 'Likes', 'Comments', 'Media Type', 'Timestamp', 'Hashtags'];
+            const csvRows = [headers.join(',')];
+
+            instagramData.forEach(post => {
+                const row = [
+                    post.username || '',
+                    `"${(post.caption || '').replace(/"/g, '""')}"`,
+                    post.like_count || post.likes || 0,
+                    post.comments_count || post.comments || 0,
+                    post.media_type || post.type || '',
+                    post.timestamp || post.created_time || '',
+                    `"${(post.hashtags || []).join(' ')}"`
+                ];
+                csvRows.push(row.join(','));
+            });
+
+            const csvContent = csvRows.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `instagram_data_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showMessage('Data exported as CSV successfully!', 'success');
+        }
+
+        function generateReport() {
+            if (!instagramData || instagramData.length === 0) {
+                showMessage('No data to generate report', 'error');
+                return;
+            }
+
+            const totalLikes = instagramData.reduce((sum, post) => sum + (post.like_count || post.likes || 0), 0);
+            const totalComments = instagramData.reduce((sum, post) => sum + (post.comments_count || post.comments || 0), 0);
+            const avgLikes = (totalLikes / instagramData.length).toFixed(0);
+            const avgComments = (totalComments / instagramData.length).toFixed(0);
+            const topPost = instagramData.reduce((top, post) => {
+                const postLikes = post.like_count || post.likes || 0;
+                const topLikes = top.like_count || top.likes || 0;
+                return postLikes > topLikes ? post : top;
+            }, instagramData[0]);
+
+            const report = `
+Instagram Analytics Report
+Generated: ${new Date().toLocaleDateString()}
+
+SUMMARY STATISTICS
+==================
+Total Posts: ${instagramData.length}
+Total Likes: ${formatNumber(totalLikes)}
+Total Comments: ${formatNumber(totalComments)}
+Average Likes per Post: ${formatNumber(avgLikes)}
+Average Comments per Post: ${formatNumber(avgComments)}
+
+TOP PERFORMING POST
+==================
+Username: @${topPost.username}
+Likes: ${formatNumber(topPost.like_count || topPost.likes || 0)}
+Comments: ${formatNumber(topPost.comments_count || topPost.comments || 0)}
+Caption: ${(topPost.caption || '').substring(0, 100)}...
+
+This report was generated by Instagram Hashtag Tracker
+            `;
+
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `instagram_report_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showMessage('Report generated successfully!', 'success');
+        }
+
+        // Event handlers
+        function initializeSortButtons() {
+            const sortButtons = document.querySelectorAll('.sort-btn');
+            sortButtons.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    // Remove active from all buttons
+                    sortButtons.forEach(b => b.classList.remove('active'));
+                    // Add active to clicked button
+                    this.classList.add('active');
+
+                    currentSort = this.dataset.sort;
+
+                    // Re-display results with new sort
+                    if (instagramData && instagramData.length > 0) {
+                        const searchTerm = document.getElementById('hashtagInput').value || 'Imported Data';
+                        displayResults(searchTerm);
+                    }
+                });
+            });
+        }
+
+        function setupEventListeners() {
+            // Enter key support for hashtag input
+            document.getElementById('hashtagInput').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    searchInstagramContent();
+                }
+            });
+
+            // Auto-resize textarea
+            const textarea = document.getElementById('dataImport');
+            textarea.addEventListener('input', function () {
+                this.style.height = 'auto';
+                this.style.height = this.scrollHeight + 'px';
+            });
+        }
+    </script>
+</body>
+
+</html>
